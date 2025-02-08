@@ -1,0 +1,37 @@
+{
+    "family": "chatbot-service",
+    "networkMode": "awsvpc",
+    "requiresCompatibilities": ["FARGATE"],
+    "cpu": "256",
+    "memory": "512",
+    "containerDefinitions": [
+        {
+            "name": "chatbot-service",
+            "image": "${ECR_REGISTRY}/chatbot-service:latest",
+            "portMappings": [
+                {
+                    "containerPort": 8000,
+                    "protocol": "tcp"
+                }
+            ],
+            "environment": [
+                {
+                    "name": "DATABASE_URL",
+                    "value": "postgresql+asyncpg://user:pass@your-rds-endpoint:5432/chatbot"
+                },
+                {
+                    "name": "REDIS_URL",
+                    "value": "redis://your-elasticache-endpoint:6379"
+                }
+            ],
+            "logConfiguration": {
+                "logDriver": "awslogs",
+                "options": {
+                    "awslogs-group": "/ecs/chatbot-service",
+                    "awslogs-region": "us-east-1",
+                    "awslogs-stream-prefix": "ecs"
+                }
+            }
+        }
+    ]
+} 

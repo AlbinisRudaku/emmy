@@ -21,5 +21,8 @@ RUN poetry config virtualenvs.create false \
 # Copy application code
 COPY . .
 
-# Run the application
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"] 
+# Make port configurable via environment variable
+ENV PORT=8000
+
+# Start command
+CMD uvicorn app.main:app --host 0.0.0.0 --port $PORT 
