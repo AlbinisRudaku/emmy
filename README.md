@@ -164,31 +164,6 @@ The service includes GitHub Actions workflows for automated deployment to AWS EC
 - Performance monitoring
 - Rate limit tracking
 
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Commit your changes
-4. Push to the branch
-5. Create a Pull Request
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🙏 Acknowledgments
-
-- FastAPI for the excellent web framework
-- Ollama for the LLM integration
-- All contributors and users of the service
-
-## 📞 Support
-
-For support, please:
-1. Check the documentation
-2. Search existing issues
-3. Create a new issue if needed
-
 ---
 
 Built with ❤️ using FastAPI, PostgreSQL, Redis, and Ollama
