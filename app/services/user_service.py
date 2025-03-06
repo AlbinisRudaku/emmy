@@ -9,8 +9,10 @@ import redis
 from sqlalchemy.exc import IntegrityError
 from asyncpg.exceptions import UniqueViolationError
 from fastapi import HTTPException
+import logging
 
 from app.models.database.user import DBUser
+from app.models.database.profile import DBUserProfile
 from app.models.user import UserCreate, UserResponse, Token
 from app.core.config import get_settings
 from app.core.exceptions import AuthenticationError
@@ -19,6 +21,7 @@ from app.services.session_service import SessionService
 
 settings = get_settings()
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+logger = logging.getLogger("chatbot")
 
 # Redis client for session management
 redis_client = redis.Redis.from_url(settings.REDIS_URL)
@@ -35,14 +38,28 @@ class UserService:
 
     async def create_user(self, user_data: UserCreate) -> UserResponse:
         try:
+            # Create user
             db_user = DBUser(
                 email=user_data.email,
                 hashed_password=self.get_password_hash(user_data.password)
             )
             self.db.add(db_user)
+            await self.db.flush()  # Flush to get the user ID but don't commit yet
+
+            # Create associated profile
+            db_profile = DBUserProfile(
+                user_id=db_user.id,
+                email=user_data.email,  # Copy email from user
+                preferences={}  # Empty preferences dict
+            )
+            self.db.add(db_profile)
+            
+            # Now commit both user and profile
             await self.db.commit()
             await self.db.refresh(db_user)
+            
             return UserResponse.from_orm(db_user)
+            
         except IntegrityError as e:
             await self.db.rollback()
             if isinstance(e.orig, UniqueViolationError):
@@ -54,6 +71,12 @@ class UserService:
                 status_code=500,
                 detail="Database error occurred"
             )
+        except Exception as e:
+            await self.db.rollback()
+            raise HTTPException(
+                status_code=500,
+                detail=str(e)
+            )
 
     async def authenticate_user(self, email: str, password: str) -> Token:
         query = select(DBUser).where(DBUser.email == email)
@@ -64,16 +87,24 @@ class UserService:
             raise AuthenticationError("Invalid credentials")
 
         session_id = uuid4()
+        logger.info(f"Generated session_id: {session_id} for user: {user.email}")
+        
         access_token = self.create_access_token(
             data={"sub": str(user.id), "session": str(session_id)}
         )
 
-        # Create session in database
+        # Create session in database with the same session_id used in the token
         session_service = SessionService(self.db)
-        await session_service.create_session(
-            user_id=user.id,
-            token=access_token
-        )
+        try:
+            await session_service.create_session(
+                user_id=user.id,
+                token=access_token,
+                session_id=session_id
+            )
+            logger.info(f"Session created for user {user.email} with id {session_id}")
+        except Exception as e:
+            logger.error(f"Error creating session: {str(e)}")
+            raise AuthenticationError(f"Failed to create session: {str(e)}")
 
         return Token(
             access_token=access_token,

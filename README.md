@@ -104,6 +104,7 @@ SECRET_KEY=your-secret-key-here
 Once running, API documentation is available at:
 - Swagger UI: `http://localhost:8000/api/v1/docs`
 - ReDoc: `http://localhost:8000/api/v1/redoc`
+- OpenAPI JSON: `http://localhost:8000/api/v1/openapi.json`
 
 ### Key Endpoints
 

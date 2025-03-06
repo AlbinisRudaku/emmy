@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, Boolean, DateTime, JSON
+from sqlalchemy import Column, String, Boolean, DateTime, JSON, ForeignKey
 from sqlalchemy.dialects.postgresql import UUID
 import uuid
 from datetime import datetime
@@ -9,6 +9,7 @@ class DBInstance(Base):
     __tablename__ = "instances"
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    user_id = Column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=True)
     api_key = Column(String, unique=True, nullable=False, index=True)
     name = Column(String, nullable=False)
     website_url = Column(String, nullable=False)

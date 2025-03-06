@@ -6,8 +6,9 @@ from uuid import UUID
 class UserBase(BaseModel):
     email: EmailStr
 
-class UserCreate(UserBase):
-    password: str
+class UserCreate(BaseModel):
+    email: EmailStr
+    password: str = Field(..., min_length=8)
 
 class UserLogin(UserBase):
     password: str

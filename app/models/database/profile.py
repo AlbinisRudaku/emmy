@@ -10,8 +10,13 @@ class DBUserProfile(Base):
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     user_id = Column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, unique=True)
+    email = Column(String, nullable=False)
     first_name = Column(String, nullable=True)
     last_name = Column(String, nullable=True)
+    job_title = Column(String, nullable=True)
+    phone = Column(String, nullable=True)
+    location = Column(String, nullable=True)
+    bio = Column(String, nullable=True)
     avatar_url = Column(String, nullable=True)
     preferences = Column(JSONB, nullable=False, default=dict)
     created_at = Column(DateTime, nullable=False, default=datetime.utcnow)

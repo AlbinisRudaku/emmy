@@ -2,7 +2,7 @@
 name = "ai-chatbot-service"
 version = "1.0.0"
 description = "A sophisticated AI chatbot service with real-time capabilities"
-authors = ["Your Name <your.email@example.com>"]
+authors = ["Albinis Rudaku <ruddaku@gmail.com>"]
 packages = [
     { include = "app" }
 ]
@@ -29,6 +29,7 @@ alembic = "^1.12.1"
 httpx = "^0.25.1"
 PyJWT = "^2.8.0"
 APScheduler = "^3.10.4"
+aiofiles = "^23.1.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.4.3"

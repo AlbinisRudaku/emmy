@@ -1,6 +1,6 @@
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, RedirectResponse
 
 from app.core.docs import setup_docs
 from app.core.logging import RequestLoggingMiddleware, logger
@@ -20,7 +20,12 @@ app = FastAPI(
     openapi_url="/api/v1/openapi.json"
 )
 
-@app.get("/health")
+@app.get("/")
+async def root():
+    """Redirect root to API documentation"""
+    return RedirectResponse(url="/api/v1/docs")
+
+@app.get("/api/v1/health")
 async def health_check():
     return {"status": "healthy"}
 

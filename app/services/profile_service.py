@@ -2,6 +2,7 @@ from typing import Optional
 from uuid import UUID
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
+from fastapi import HTTPException, status
 
 from app.models.database.profile import DBUserProfile
 from app.models.profile import ProfileUpdate, ProfileResponse
@@ -40,10 +41,18 @@ class ProfileService:
         if not profile:
             raise NotFoundException("Profile not found")
         
+        # Update only provided fields
         update_data = profile_data.dict(exclude_unset=True)
         for key, value in update_data.items():
             setattr(profile, key, value)
         
-        await self.db.commit()
-        await self.db.refresh(profile)
-        return ProfileResponse.from_orm(profile) 
+        try:
+            await self.db.commit()
+            await self.db.refresh(profile)
+            return ProfileResponse.from_orm(profile)
+        except Exception as e:
+            await self.db.rollback()
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Failed to update profile"
+            ) 
