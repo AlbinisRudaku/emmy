@@ -92,11 +92,11 @@ ai-chatbot-service/
 ## 🔧 Configuration
 Configuration is managed through environment variables and the `.env` file. Key configuration options:
 ```bash
-DATABASE_URL=postgresql+asyncpg://postgres:postgres@db:5432/chatbot
+DATABASE_URL=postgresql+asyncpg://username:password@db:5432/chatbot
 REDIS_URL=redis://redis:6379
 OLLAMA_BASE_URL=http://ollama:11434
 DEBUG=True
-SECRET_KEY=your-secret-key-here
+SECRET_KEY={secret-key}
 ```
 
 ## 📚 API Documentation
